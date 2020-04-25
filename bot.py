@@ -15,7 +15,7 @@ def findat(msg):
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-  sped = "Tezlik: "
+  sped = "Speeed: "
   start = datetime.now()
   msge = bot.reply_to(message, sped)
   end = datetime.now()
