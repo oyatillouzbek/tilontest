@@ -4,7 +4,7 @@ import pyspeedtest
 from datetime import datetime
 #import degani bu osha requirements.txt fayli ichidagi modullarni import qilib olyapti yani chaqirib olyaptim
 
-TOKEN = "token joyi" #token joyi
+TOKEN = "914816327:AAHHJtlSTKl20xz3wRVcNT4F3qiaSlRD1Os" #token joyi
 bot = telebot.TeleBot(token=TOKEN)
 
 def findat(msg):
