@@ -72,7 +72,7 @@ def txt(client,message):
     chatidi = str(message.chat.id)
     if not os.path.exists(chatidi):
         os.makedirs(chatidi)
-    if message.text == "/get" and not message.reply_to_message:
+    if "/get" in message.text and not message.reply_to_message:
         fromid = str(message.from_user.id)
         if not os.path.exists(chatidi + "/" + fromid + ".txt"):
             put = open(chatidi + "/" + fromid + ".txt","w")
@@ -83,6 +83,10 @@ def txt(client,message):
         get = str(get)
         message.reply_text("Siz shu kungacha " + get +"ta odam qo'shgansiz.")
     else:
+        if not os.path.exists(chatidi + "/" + fromid + ".txt"):
+            put = open(chatidi + "/" + fromid + ".txt","w")
+            put.write("0")
+            put.close()
         firstname = str(message.reply_to_message.from_user.first_name)
         MENTION = "[{}](tg://user?id={})"
         fromid = str(message.reply_to_message.from_user.id)
