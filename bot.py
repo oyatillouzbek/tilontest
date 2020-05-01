@@ -90,11 +90,11 @@ def txt(client,message):
             put.close()
         firstname = str(message.reply_to_message.from_user.first_name)
         MENTION = "[{}](tg://user?id={})"
-        fromid = str(message.reply_to_message.from_user.id)
-        get = open(chatidi + "/" + fromid + ".txt","r")
+        fromi = str(message.reply_to_message.from_user.id)
+        get = open(chatidi + "/" + fromi + ".txt","r")
         get = get.read()
         get = str(get)
-        text = MENTION.format(firstname,fromid)
+        text = MENTION.format(firstname,fromi)
         message.reply_text(text +" shu kungacha " + get +"ta odam qo'shgan.")
 
 
