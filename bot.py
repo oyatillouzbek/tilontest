@@ -83,7 +83,7 @@ def txt(client,message):
             get = get.read()
             get = str(get)
             message.reply_text("Siz shu kungacha " + get +"ta odam qo'shgansiz.")
-        else:
+        elif "/get" in message.text and message.reply_to_message:
             replyid = str(message.reply_to_message.from_user.id)
             if not os.path.exists(chatidi + "/" + replyid + ".txt"):
                 put = open(chatidi + "/" + replyid + ".txt","w")
