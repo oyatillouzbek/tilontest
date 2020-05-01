@@ -72,29 +72,30 @@ def txt(client,message):
     chatidi = str(message.chat.id)
     if not os.path.exists(chatidi):
         os.makedirs(chatidi)
-    if "/get" in message.text and not message.reply_to_message:
-        fromid = str(message.from_user.id)
-        if not os.path.exists(chatidi + "/" + fromid + ".txt"):
-            put = open(chatidi + "/" + fromid + ".txt","w")
-            put.write("0")
-            put.close()
-        get = open(chatidi + "/" + fromid + ".txt","r")
-        get = get.read()
-        get = str(get)
-        message.reply_text("Siz shu kungacha " + get +"ta odam qo'shgansiz.")
-    else:
-        replyid = str(message.reply_to_message.from_user.id)
-        if not os.path.exists(chatidi + "/" + replyid + ".txt"):
-            put = open(chatidi + "/" + replyid + ".txt","w")
-            put.write("0")
-            put.close()
-        firstname = str(message.reply_to_message.from_user.first_name)
-        MENTION = "[{}](tg://user?id={})"
-        get = open(chatidi + "/" + replyid + ".txt","r")
-        get = get.read()
-        get = str(get)
-        text = MENTION.format(firstname,replyid)
-        message.reply_text(text +" shu kungacha " + get +"ta odam qo'shgan.")
+    if message.chat.type == "supergroup" or message.chat.type == "group":
+        if "/get" in message.text and not message.reply_to_message:
+            fromid = str(message.from_user.id)
+            if not os.path.exists(chatidi + "/" + fromid + ".txt"):
+                put = open(chatidi + "/" + fromid + ".txt","w")
+                put.write("0")
+                put.close()
+            get = open(chatidi + "/" + fromid + ".txt","r")
+            get = get.read()
+            get = str(get)
+            message.reply_text("Siz shu kungacha " + get +"ta odam qo'shgansiz.")
+        else:
+            replyid = str(message.reply_to_message.from_user.id)
+            if not os.path.exists(chatidi + "/" + replyid + ".txt"):
+                put = open(chatidi + "/" + replyid + ".txt","w")
+                put.write("0")
+                put.close()
+            firstname = str(message.reply_to_message.from_user.first_name)
+            MENTION = "[{}](tg://user?id={})"
+            get = open(chatidi + "/" + replyid + ".txt","r")
+            get = get.read()
+            get = str(get)
+            text = MENTION.format(firstname,replyid)
+            message.reply_text(text +" shu kungacha " + get +"ta odam qo'shgan.")
 
 
 app.run()
