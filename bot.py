@@ -1,62 +1,96 @@
-import time
-import telebot
-import urllib3
-import json
-from datetime import datetime
-#import degani bu osha requirements.txt fayli ichidagi modullarni import qilib olyapti yani chaqirib olyaptim
+from pyrogram import Client, Filters
+import asyncio
+import os
+api_id = 1194939
+api_hash = "d8ed4b10ed554767a4570cf59c3ea49e"
 
-TOKEN = "914816327:AAHHJtlSTKl20xz3wRVcNT4F3qiaSlRD1Os" #token joyi
-bot = telebot.TeleBot(token=TOKEN)
-
-def findat(msg):
-
-    for i in msg:
-        if '@' in i:
-            return i
-@bot.message_handler(content_types=['video','photo','sticker','document','audio','voice'])
-def all(m):
-    if m.chat.type == 'private':
-        if m.photo:
-            fileid = m.photo[1].file_id
-        elif m.video:
-                fileid = m.video.file_id
-        elif m.sticker:
-                fileid = m.sticker.file_id
-        elif m.document:
-                fileid = m.document.file_id
-        elif m.audio:
-                fileid = m.audio.file_id
-        elif m.voice:
-                fileid = m.voice.file_id
-                e = m.from_user.username
-                http = urllib3.PoolManager()
-                link = http.request("GET","https://api.pwrtelegram.xyz/bot{}/getFile?file_id={}".format(TOKEN,fileid))
-                link1 = link.data
-                jdat = json.loads(link1)
-                patch = jdat['result']['file_path']
-                send = 'https://storage.pwrtelegram.xyz/{}'.format(patch)
-                bot.send_message(m.chat.id,'*File Id:*\n{}'.format(fileid),parse_mode='Markdown')
-                bot.send_message(m.chat.id,'File Uploaded\nYour link: {}'.format(send))
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-  sped = "Speeed: "
-  start = datetime.now()
-  msge = bot.reply_to(message, sped)
-  end = datetime.now()
-  ms = (end - start).microseconds / 1000
-  speed = sped + str(ms)
-  bot.edit_message_text(speed,chat_id=msge.chat.id, message_id=msge.message_id)
-
-@bot.message_handler(func=lambda msg: msg.text is not None and '@' in msg.text)
-
-def at_converter(message):
-    texts = message.text.split()
-    at_text = findat(texts)
-    if at_text == '@': 
-        pass
-    else:
-        insta_link = "https://instagram.com/{}".format(at_text[1:])
-        bot.reply_to(message, insta_link)
-        
+app = Client(
+    "bot",
+    api_id=api_id,
+    api_hash=api_hash)
     
-bot.polling(none_stop=True) #biu doimo kod oxirida huddi shunday turishi kerak.
+RUNNING = "**Eval Expression:**\n```{}```\n**Running...**"
+ERROR = "**Eval Expression:**\n```{}```\n**Error:**\n```{}```"
+SUCCESS = "**Eval Expression:**\n```{}```\n**Success**"
+RESULT = "**Eval Expression:**\n```{}```\n**Result:**\n```{}```"
+
+@app.on_message(Filters.command("eval", "!"))
+def eval_expression(client, message):
+    expression = " ".join(message.command[1:])
+
+    if expression:
+        m = message.reply(RUNNING.format(expression))
+
+        try:
+            result = eval(expression)
+        except Exception as error:
+            client.edit_message_text(
+                m.chat.id,
+                m.message_id,
+                ERROR.format(expression, error)
+            )
+        else:
+            if result is None:
+                client.edit_message_text(
+                    m.chat.id,
+                    m.message_id,
+                    SUCCESS.format(expression)
+                )
+            else:
+                client.edit_message_text(
+                    m.chat.id,
+                    m.message_id,
+                    RESULT.format(expression, result)
+                )
+@app.on_message(Filters.new_chat_members)
+def newuser(client,message):
+    chatidi = str(message.chat.id)
+    if not os.path.exists(chatidi):
+        os.makedirs(chatidi)
+    for i in message.new_chat_members:
+        userid = str(i.id)
+        fromid = str(message.from_user.id)
+    if userid == fromid:
+            put = open(chatidi + "/" + userid + ".txt","w")
+            put.write("0")
+            put.close()
+    else:
+        if not os.path.exists(chatidi + "/" + fromid + ".txt"):
+            put = open(chatidi + "/" + fromid + ".txt","w")
+            put.write("0")
+            put.close()
+        get = open(chatidi + "/" + fromid + ".txt","r")
+        get = get.read()
+        get = int(get)
+        get += 1
+        put = open(chatidi + "/" + fromid + ".txt","w")
+        put.write(str(get))
+        put.close()
+        
+@app.on_message(Filters.text)
+def txt(client,message):
+    chatidi = str(message.chat.id)
+    if not os.path.exists(chatidi):
+        os.makedirs(chatidi)
+    if message.text == "/get" and not message.reply_to_message:
+        fromid = str(message.from_user.id)
+        if not os.path.exists(chatidi + "/" + fromid + ".txt"):
+            put = open(chatidi + "/" + fromid + ".txt","w")
+            put.write("0")
+            put.close()
+        get = open(chatidi + "/" + fromid + ".txt","r")
+        get = get.read()
+        get = str(get)
+        message.reply_text("Siz shu kungacha " + get +"ta odam qo'shgansiz.")
+    else:
+        firstname = str(message.reply_to_message.from_user.first_name)
+        MENTION = "[{}](tg://user?id={})"
+        fromid = str(message.reply_to_message.from_user.id)
+        get = open(chatidi + "/" + fromid + ".txt","r")
+        get = get.read()
+        get = str(get)
+        text = MENTION.format(firstname,fromid)
+        message.reply_text(text +" shu kungacha " + get +"ta odam qo'shgan.")
+
+
+app.run()
